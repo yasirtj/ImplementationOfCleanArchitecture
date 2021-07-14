@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApplicationLayer.ServiceExtenstion;
 using InfrastructureLayer.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,15 +24,24 @@ namespace UILayer
         }
 
         public IConfiguration Configuration { get; }
-
+            
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddDbContext<StudentDbContext>(options =>
-     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<IStudentDbContext, StudentDbContext>(options =>
+     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+     sqlServerOptionsAction : sqlOptions =>
+     {
+         sqlOptions.EnableRetryOnFailure();
+     }
+     ));
+            
+
             services.AddControllersWithViews();
+            services.ApplicationService();
+            services.InfrastructureService();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,7 +68,7 @@ namespace UILayer
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Student}/{action=Index}/{id?}");
             });
         }
     }
