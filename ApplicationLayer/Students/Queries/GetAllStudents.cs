@@ -1,13 +1,15 @@
 ﻿using EntitiesLayer;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ApplicationLayer.Students.Queries
 {
     public interface IGetAllStudents
     {
-        IEnumerable<EntitiesLayer.Student> GetAll();
+        IEnumerable<StudentModel> GetAll();
     }
     public class GetAllStudents : IGetAllStudents
     {
@@ -16,9 +18,14 @@ namespace ApplicationLayer.Students.Queries
         {
             _studentRepository = studentRepository;
         }
-        public IEnumerable<Student> GetAll()
+
+        public IEnumerable<StudentModel> GetAll()
         {
-            return _studentRepository.GetAll();
+            var Model = _studentRepository.GetAll()
+                .Select(i => new StudentModel { FirstName = i.FirstName, LastName = i.LastName })
+                .ToList();
+            return Model;
         }
+
     }
 }

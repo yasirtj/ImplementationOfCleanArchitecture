@@ -11,7 +11,7 @@ using UILayer.ViewModels;
 
 namespace UILayer.Controllers
 {
-    
+
     public class StudentController : Controller
     {
         private readonly ICreateStudent _createStudent;
@@ -19,7 +19,7 @@ namespace UILayer.Controllers
         private readonly IDeleteStudent _deleteStudent;
         private readonly IGetAllStudents _getAllStudents;
         private readonly IGetStudentById _getStudentById;
-        
+
         public StudentController(ICreateStudent createStudent, IEditStudent editStudent, IDeleteStudent deleteStudent, IGetAllStudents getAllStudents, IGetStudentById getStudentById)
         {
             _createStudent = createStudent;
@@ -31,19 +31,12 @@ namespace UILayer.Controllers
         // GET: Student
         public ActionResult Index()
         {
+            var Vm = _getAllStudents.GetAll()
+                .Select(i => new StudentViewModel { FirstName = i.FirstName, LastName = i.LastName })
+                .ToList();
 
-            var studentsList = new List<StudentViewModel>();
-            foreach (var item in studentsList)
-            {
-                studentsList.Add(new StudentViewModel
-                {
-                    //Id = item.Id,
-                    FirstName = item.FirstName,
-                    LastName = item.LastName,
-                   // Subjects = item.Subjects
-                });
-            }
-            return View(studentsList);
+
+            return View(Vm);
         }
 
         // GET: Student/Details/5
@@ -65,20 +58,21 @@ namespace UILayer.Controllers
         {
             if (ModelState.IsValid)
             {
-               _createStudent.create(new StudentModel
-               { 
+                _createStudent.create(new StudentModel
+                {
 
                     FirstName = studentModel.FirstName,
                     LastName = studentModel.LastName,
-                    //Subjects = studentModel.Subjects
-                
+                    // Subjects = studentModel.Subjects
+
                 });
 
-                return RedirectToAction("Index");
-                
+
+                return View(studentModel);
+
             }
 
-            
+
             //try
             //{ 
             //    StudentViewModel studentViewModel = new StudentViewModel();
@@ -96,7 +90,8 @@ namespace UILayer.Controllers
             //{
             //    return View(studentViewModel);
             //}
-            return View(studentModel);
+            return RedirectToAction("Index");
+
         }
 
         // GET: Student/Edit/5
@@ -147,10 +142,10 @@ namespace UILayer.Controllers
         public StudentModel ConvertToModel(StudentViewModel studentViewModel)
         {
             var model = new StudentModel();
-      
+
             model.FirstName = studentViewModel.FirstName;
             model.LastName = studentViewModel.LastName;
-           // model.Subjects = studentViewModel.Subjects;
+            // model.Subjects = studentViewModel.Subjects;
 
             return model;
         }
@@ -158,8 +153,8 @@ namespace UILayer.Controllers
         {
 
             StudentViewModel model = new StudentViewModel();
-            
-       
+
+
             model.FirstName = studentModel.FirstName;
             model.LastName = studentModel.LastName;
             //model.Subjects = studentModel.Subjects;
